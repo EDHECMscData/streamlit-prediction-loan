@@ -4,6 +4,13 @@ import numpy as np
 import pickle
 import base64
 
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+
 
 
 @st.cache(suppress_st_warning=True)
@@ -19,19 +26,37 @@ def get_value(val,my_dict):
             return value
        
 app_mode = st.sidebar.selectbox('Select Page',['Home','Prediction'])
+
+### I) Home part of the script  
 if app_mode=='Home':
-    st.title('LOAN PREDICTION :')
+    st.title('Welcome to the loan prediction laboratory :')
     st.image('loan.png') 
-    st.write('App for Loan Prediction') 
+    st.write('This app is an introduction on how to deploy code on streamlit.')
+    st.write('It is predicting if a customer should be attributed a loan. The model behind is a random forest model')
+    st.markdown("### This App in fewsteps : ")
+    st.markdown("1 - Preload historical data from a bank")
+    st.markdown("2 - Let you select the client information")
+    st.markdown("3 - Enter the inputs in the model")
+    st.markdown("4 - Use the pretrained model saved in the .sav file")
+    st.markdown("5 - Output a prediction Yes (1)  or No (0) if the loan was accepted or not")
+
+
+    st.markdown('Dataset :')
+    data=pd.read_csv('loan_dataset.csv')
+    st.write(data.head())
+
+
+
+
    
-   
+### II) Here we deal with the prediction part    
    
 elif app_mode =='Prediction':
     
     
-    st.image('slider-short-3.jpg')
+    st.image('data-background.png')
 
-    st.subheader('Sir/Mme , YOU need to fill all neccesary informations in order to get a reply to your loan request !')
+    st.subheader('Dear client from the bank , following needs to be filled  ! To give you a proper answer if you can get a loan!')
     st.sidebar.header("Informations about the client :")
     gender_dict = {"Male":1,"Female":2}
     feature_dict = {"No":1,"Yes":2}
@@ -87,36 +112,12 @@ elif app_mode =='Prediction':
     single_sample = np.array(feature_list).reshape(1,-1)
 
     if st.button("Predict"):
-        file_ = open("6m-rain.gif", "rb")
-        contents = file_.read()
-        data_url = base64.b64encode(contents).decode("utf-8")
-        file_.close()
-   
-        file = open("green-cola-no.gif", "rb")
-        contents = file.read()
-        data_url_no = base64.b64encode(contents).decode("utf-8")
-        file.close()
-   
-   
         loaded_model = pickle.load(open('Random_Forest.sav', 'rb'))
         prediction = loaded_model.predict(single_sample)
         if prediction[0] == 0 :
-            st.error(
-    'According to our Calculations, you will not get the loan from Bank'
-    )
-            st.markdown(
-    f'<img src="data:image/gif;base64,{data_url_no}" alt="cat gif">',
-    unsafe_allow_html=True,)
+            st.error('According to our Calculations, we cannot provide you with a loan')
+            st.image('denied.png')
         elif prediction[0] == 1 :
-            st.success(
-    'Congratulations!! you will get the loan from Bank'
-    )
-            st.markdown(
-    f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
-    unsafe_allow_html=True,
-    )
-
-
-
-
-
+            st.success('Congratulations!! you will get the loan from Bank')
+            st.image('approved.png')
+            
