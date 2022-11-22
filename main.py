@@ -47,7 +47,6 @@ if app_mode=='Home':
 
 
 
-
    
 ### II) Here we deal with the prediction part    
    
